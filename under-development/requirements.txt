@@ -1,0 +1,4 @@
+
+theano
+cython
+h5py

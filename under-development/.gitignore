@@ -1,0 +1,8 @@
+*.swp
+test_data
+apil-data
+*.hdf5
+*.npy
+*.pyc
+*.pkl
+*.json
