@@ -8,14 +8,11 @@ The older, fully-functioning AutoTrace system requires Matlab and several python
 
 
 
-##[Matlab-free version](https://github.com/jjberry/Autotrace/tree/master/under-development) (under-development)
-A Matlab-free version is currently under development.  This new version will require PyQt4 to be installed, which is available
-from http://www.riverbankcomputing.com/software/pyqt/intro  
-PyQt4 requires Qt to be installed which can be obtained from http://qt-project.org/
+##[Matlab-free version](https://github.com/bamartin-ua/Autotrace) (under-development)
+A Matlab-free version is currently under development. This project draws inspiration from the Matlab version (above), and from an older attempt at a Matlab-free version (which can be fount at https://github.com/jjberry/Autotrace/tree/master/under-development), making this the third in the Autotrace line, and thus the codename Autotres.
 
-The code for training deep networks is adapted from the author's translational-DBN repository (https://github.com/jjberry/translational-DBN)
-which requires gnumpy.py (http://www.cs.toronto.edu/~tijmen/gnumpy.html) to be on the system's Python `PATH`.
-The use of gnumpy.py allows the network to be trained on a CUDA-capable GPU if present, using the `cudamat` library (https://code.google.com/p/cudamat/)
-If no GPU is present, `gnumpy.py` will use the CPU, which requires `npmat.py` (http://www.cs.toronto.edu/~ilya/npmat.py).
+The code for training deep networks uses [Lasagne](https://github.com/Lasagne/Lasagne) and [Theano](http://deeplearning.net/software/theano/)
+These allow the network to be trained on a CUDA-capable GPU if present (with limited support for open-cl).
+If no GPU is present, theano will use the CPU. For best results, a BLAS library with multithreading support is suggested, such as [OpenBLAS](http://www.openblas.net).
 
-The Qt-based tools are cross platform, and have been tested on Windows 7, Linux, and Mac OS X, with Qt 4.8.
+Currently, the project lacks a graphical interface, and has only been tested on Ubuntu 14.04. With luck, future versions will rectify these shortcomings.
