@@ -6,3 +6,4 @@ apil-data
 *.pyc
 *.pkl
 *.json
+*.log

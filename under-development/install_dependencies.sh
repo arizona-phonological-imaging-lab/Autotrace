@@ -2,9 +2,8 @@
 
 set -e
 
-apt-get -y install python-numpy python-scipy python-dev python-pip g++ \
-    python-nose libopenblas-dev git \
-    libhdf5-dev
+apt-get -y install python-dev python-pip g++ \
+    libopenblas-dev libhdf5-dev
 
 # some day ubuntu will release a working CUDA repo
 # until that day comes, we need to get it straight from nvidia
@@ -27,12 +26,6 @@ else
 fi
 
 pip install -r requirements.txt
-
-git clone https://github.com/Lasagne/Lasagne.git
-    cd Lasagne
-    python setup.py install
-    cd ..
-rm -rf Lasagne
 
 echo Autotrace dependencies successfully installed.
 echo   You may have to reboot before GPU accelleration will work.
