@@ -59,7 +59,7 @@ class Autotracer(object):
         self.roi = ROI(roi)
         self.__init_model()
 
-    def loadHDF5(self,train,test):
+    def loadHDF5(self,train,test=None):
         """Load a test and training dataset from hdf5 databases
 
         Args:
@@ -78,18 +78,26 @@ class Autotracer(object):
             self.y_train = np.array(h['trace'])
             self.Xshape = self.X_train.shape[1:]
             self.yshape = self.y_train.shape[1:]
-        with h5py.File(test,'r') as h:
-            self.X_valid = np.array(h['image'])
-            self.y_valid = np.array(h['trace'])
-            mismatch = False
-            if self.X_valid.shape[1:] != self.Xshape:
-                logging.warn("Train and test set have different input shape")
-                mismatch = True
-            if self.y_valid.shape[1:] != self.yshape:
-                logging.warn("Train and test set have different output shape")
-                mismatch = True
-            if mismatch:
-                raise ShapeError(self.X_valid.shape[1:],self.y_valid.shape[1:])
+        if test:
+            with h5py.File(test,'r') as h:
+                self.X_valid = np.array(h['image'])
+                self.y_valid = np.array(h['trace'])
+        else: 
+            # split the training data into a training set and a validation set. 
+            i = np.floor(self.X_train.shape[0] * 0.75)
+            self.X_valid = self.X_train[i:]
+            self.y_valid = self.y_train[i:]
+            self.X_train = self.X_train[:i]
+            self.y_train = self.y_train[:i]
+        mismatch = False
+        if self.X_valid.shape[1:] != self.Xshape:
+            logging.warn("Train and test set have different input shape")
+            mismatch = True
+        if self.y_valid.shape[1:] != self.yshape:
+            logging.warn("Train and test set have different output shape")
+            mismatch = True
+        if mismatch:
+            raise ShapeError(self.X_valid.shape[1:],self.y_valid.shape[1:])
 
     def __init_layers(self,layer_size):
         """Create the architecture of the MLP
