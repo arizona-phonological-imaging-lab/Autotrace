@@ -255,6 +255,14 @@ class Autotracer(object):
                 json.dump(js,f)
         return t
 
+    def save(self,fname):
+        params = np.array(lasagne.layers.get_all_param_values(self.layer_out))
+        np.save(fname,params)
+
+    def load(self,fname):
+        params = np.load(fname)
+        lasagne.layers.set_all_param_values(self.layer_out,params)
+
     def train(self,num_epochs=2500,batch_size=512):
         """Train the MLP using minibatches
 
