@@ -1,14 +1,14 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import os
 import logging
 from glob import glob
 import fnmatch
 import h5py
-import Image
+from PIL import Image
 import numpy as np
 
-from roi import ROI
+from .roi import ROI
 
 def get_from_files(d,path,roi,scale=1,n_points=32,buff=512,blacklist=[]):
     """Create an hdf5 dataset from a folder of images and traces
@@ -48,6 +48,10 @@ def get_from_files(d,path,roi,scale=1,n_points=32,buff=512,blacklist=[]):
         (0,n_points,1,1),
         maxshape = (None,n_points,1,1),
         chunks = (buff,n_points,1,1), compression='gzip')
+    try:
+        unicode
+    except NameError:
+        unicode = str
     hp.create_dataset('name',
         (0,),
         maxshape = (None,),

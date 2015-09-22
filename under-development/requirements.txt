@@ -6,3 +6,4 @@ lasagne
 numpy
 scipy
 nose
+pillow
