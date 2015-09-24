@@ -2,7 +2,7 @@
 
 set -e
 
-apt-get -y install python-dev python-pip g++ \
+apt-get -y install python3-dev python3-pip g++ \
     libopenblas-dev libhdf5-dev
 
 # some day ubuntu will release a working CUDA repo
@@ -25,7 +25,7 @@ else
     ldconfig
 fi
 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 echo Autotrace dependencies successfully installed.
 echo   You may have to reboot before GPU accelleration will work.
