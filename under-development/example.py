@@ -19,5 +19,6 @@ if __name__ == '__main__':
                 'train.hdf5',roi,scale=.1,blacklist=set(h['name']))
     a = a3.Autotracer('train.hdf5','test.hdf5',roi)
     a.train()
+    a.save('example.a3.npy')
     with h5py.File('test.hdf5','r') as h:
         a.trace(a.X_valid,'traces.json',h['name'],'autotest','042')
