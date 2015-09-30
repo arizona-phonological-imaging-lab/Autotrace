@@ -138,9 +138,9 @@ class ROI(object):
         """json stringify the ROI"""
         j = {
             'srcY': self.offset[0],
-            'destY': self.extent[0],
+            'destY': self.shape[0],
             'srcX': self.offset[1],
-            'destX': self.extent[1],
+            'destX': self.shape[1],
         }
         return json.dumps(j)
     
