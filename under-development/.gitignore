@@ -1,6 +1,7 @@
 *.swp
 test_data
 apil-data
+SG
 *.hdf5
 *.npy
 *.pyc
