@@ -86,13 +86,18 @@ class Dataset(object):
         except AttributeError:
             pass
 
-    def scan_directory(self,d,types,keys,sep=':'):
+    def scan_directory(self,d,types,keys,sep=':',report_every=1000):
+        N_matches = 0
         for dirpath,__,filenames in os.walk(d):
+          logging.debug('entering %s...',dirpath)
           for filename in filenames:
             fullpath = os.sep.join((dirpath,filename))
             for stype in types: #"source type"
                 match = re.search(types[stype]['regex'],fullpath)
                 if match:
+                    N_matches += 1
+                    if not N_matches % report_every:
+                        logging.debug('matched %d files',N_matches)
                     match_keys = match.groupdict()
                     node = self.sources
                     ID = []
@@ -112,8 +117,8 @@ class Dataset(object):
                     if 'conflict' not in types[stype]:
                         if 'path' in node:
                             logging.error(
-                                '%s conflicts with %s for item %s',
-                                (node['path'],fullpath,ID))
+                                '%s conflicts with %s for item %s, type %s',
+                                node['path'],fullpath,ID,stype)
                             raise ConflictError(ID,
                                                 node['path'],fullpath)
                         else:
@@ -128,8 +133,8 @@ class Dataset(object):
                             logging.error(
                                 ('%s(md5sum:%s) hash-conflicts with '
                                  'item %s(md5sum:%s) for item %s'),
-                                (node['path'],node['hash'],
-                                 fullpath,md5,ID))
+                                node['path'],node['hash'],
+                                fullpath,md5,ID)
                             raise ConflictError(ID,
                                                 node['path'],fullpath)
                         node['path'] = fullpath
@@ -189,7 +194,7 @@ def __buffered_read(f,buff):
         dat = f.read(buff)
         if dat: yield dat
 
-def _image_from_file(path,roi,scale=.1,**kwargs):
+def _image_from_file(path,roi,scale,**kwargs):
     """Extract a porperly scaled section of an image
 
     Args:
@@ -242,7 +247,10 @@ def _trace_from_file(path,roi,n_points,**kwargs):
         return np.array(0)
 
 def _name_from_info(fname,**kwargs):
-    return np.array(fname)
+    try:
+        return np.array(fname[0])
+    except TypeError:
+        return np.array(fname)
 
 _types = {
     'trace': {
