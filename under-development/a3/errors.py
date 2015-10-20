@@ -16,3 +16,19 @@ class ShapeError(Exception):
     def __init__(self,Xshape,yshape):
         self.Xshape = Xshape
         self.yshape = yshape
+
+class ConflictError(Exception):
+    """Raised when there is conflicting data for the same token
+
+    This means that you have two conflicting traces, images, etc.
+    for a certain token. This could also mean you have non-unique IDs.
+    Attributes:
+        ID (str): the identifier for which conflicting data exists
+        f1 (str): the path to the first file
+        f2 (str): the path to the file that conflicts with f1
+    """
+
+    def __init__(self,ID,f1,f2):
+        self.ID = ID
+        self.f1 = f1
+        self.f2 = f2
