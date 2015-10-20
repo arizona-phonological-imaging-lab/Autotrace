@@ -241,6 +241,7 @@ class Autotracer(object):
                 The traces will be scaled up to the scale of the image,
                 rather than on the scale required for input.
         """
+        import pudb; pu.db
         t, = self._trace_fn(X)
         if jfile:
             domain = self.roi.domain(t.shape[1])

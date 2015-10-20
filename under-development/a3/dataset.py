@@ -29,11 +29,12 @@ class Dataset(object):
         self.callbacks = {
             'image': _image_from_file,
             'trace': _trace_from_file,
+            'name' : _name_from_info,
             }
         if 'dname' in kwargs:
             self.scan_directory(kwargs['dname'],**kwargs)
         if backing.endswith('hdf5'):
-            self.__backing = hdf5.File(backing)
+            self.__backing = h5py.File(backing)
         else:
             self.__backing = {}
         self.settings = kwargs
@@ -45,14 +46,14 @@ class Dataset(object):
         if key in self:
             del self[key]
         if type(value) == tuple:
-            dtype = (h5py.special_dtype(vlen=unicode)
-                     if key.lower() == 'id' else 'f32' )
             maxshape = (None,) + value[1:]
             if type(self.__backing) == dict:
                 self.__backing[key] = np.ndarray(
                     value,
-                    dtype=dtype)
+                    dtype='<U15')
             elif type(self.__backing) == h5py.File:
+                dtype = (h5py.special_dtype(vlen=unicode)
+                     if key.lower() in ['id','name'] else 'f32' )
                 self.__backing.create_dataset(
                     key,
                     shape=value,
@@ -62,11 +63,15 @@ class Dataset(object):
             if type(self.__backing) == dict:
                 self.__backing[key] = value
             elif type(self.__backing) == h5py.File:
+                dtype = (h5py.special_dtype(vlen=unicode)
+                     if key.lower() in ['id','name'] else 'f32' )
                 maxshape = (None,) + value.shape[1:]
                 self.__backing.create_dataset(
                     key,
-                    data=value,
-                    maxshape=maxshape)
+                    shape=value.shape,
+                    maxshape=maxshape,
+                    dtype=dtype)
+                self.__backing[key][:] = value
         else: raise TypeError
 
     def __delitem__(self,key):
@@ -158,8 +163,8 @@ class Dataset(object):
                 val = self.callbacks[k](**dict(d[k],**self.settings))
                 if k not in self:
                     self[k] = (N,) + val.shape
-                i = self['id'][:] == d[k]['id']
-                self[k][i,:] = val
+                i = np.where(self['id'][:] == d[k]['id'])[0][0]
+                self[k][i] = val
 
     def __read_sources(self,node,types,context):
         type_1 = {k:node[k] for k in node if k not in types}
@@ -236,6 +241,9 @@ def _trace_from_file(path,roi,n_points,**kwargs):
     else: 
         return np.array(0)
 
+def _name_from_info(fname,**kwargs):
+    return np.array(fname)
+
 _types = {
     'trace': {
         'regex': r'(?P<study>\d+\w+)_(?P<frame>\d+)\.(?:jpg|png)\.(?P<tracer>\w+)\.traced\.txt$',
@@ -245,12 +253,15 @@ _types = {
         'regex': r'(?P<study>\d+\w+)_(?P<frame>\d+)\.(?P<ext>jpg|png)$',
         'conflict': 'hash'
         },
+    'name': {
+        'regex': r'(?P<fname>(?P<study>\d+\w+)_(?P<frame>\d+)\.(?P<ext>jpg|png))$',
+    }
     }
 if __name__=='__main__':
     roi = (140,320,250,580)
     n_points = 32
     keys = ['study','frame']
     types = _types
-    ds = Dataset(roi=roi,n_points=n_points)
+    ds = Dataset(backing="test.hdf5",roi=roi,n_points=n_points)
     ds.scan_directory('./test_data',types,keys)
     ds.read_sources(types.keys())
