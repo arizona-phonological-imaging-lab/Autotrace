@@ -129,23 +129,34 @@ class Autotracer(object):
             nonlinearity = lasagne.nonlinearities.rectify,
             W = lasagne.init.GlorotUniform())
         l_hidden1_d = lasagne.layers.DropoutLayer(l_hidden1, p=.5)
-        l_hidden2 = lasagne.layers.DenseLayer(
+
+        l_hidden2a = lasagne.layers.DenseLayer(
             l_hidden1_d,
             num_units = layer_size,
             nonlinearity = lasagne.nonlinearities.rectify,
             W = lasagne.init.GlorotUniform())
-        l_hidden2_d = lasagne.layers.DropoutLayer(l_hidden2, p=.5)
-        l_hidden3 = lasagne.layers.DenseLayer(
-            l_hidden2_d,
-            num_units = layer_size,
-            nonlinearity = lasagne.nonlinearities.rectify,
-            W = lasagne.init.GlorotUniform())
-        l_hidden3_d = lasagne.layers.DropoutLayer(l_hidden3, p=.5)
-        self.layer_out = lasagne.layers.DenseLayer(
-            l_hidden3_d,
+        l_hidden2a_d = lasagne.layers.DropoutLayer(l_hidden2a, p=.5)
+        l_hidden3a = lasagne.layers.DenseLayer(
+            l_hidden2a_d,
             num_units = self.yshape[0],
             nonlinearity = lasagne.nonlinearities.rectify,
             W = lasagne.init.GlorotUniform())
+
+        l_hidden2b = lasagne.layers.DenseLayer(
+            l_hidden1_d,
+            num_units = layer_size,
+            nonlinearity = lasagne.nonlinearities.rectify,
+            W = lasagne.init.GlorotUniform())
+        l_hidden2b_d = lasagne.layers.DropoutLayer(l_hidden2b, p=.5)
+        l_hidden3b = lasagne.layers.DenseLayer(
+            l_hidden2b_d,
+            num_units = self.yshape[0],
+            nonlinearity = theano.tensor.nnet.hard_sigmoid,
+            W = lasagne.init.GlorotUniform())
+
+        self.layer_out = lasagne.layers.ElemwiseMergeLayer(
+            [l_hidden3a,l_hidden3b],
+            merge_function=theano.tensor.mul)
 
     def __init_model(self,layer_size=2048):
         """Initializes the model
@@ -297,3 +308,4 @@ class Autotracer(object):
             valid_loss = np.mean(valid_losses)
             logging.info('Epoch: %d, train_loss=%f, valid_loss=%f'
                     % (epoch_num+1, train_loss, valid_loss))    
+
