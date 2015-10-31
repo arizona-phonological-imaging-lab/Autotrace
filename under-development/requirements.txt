@@ -2,3 +2,9 @@
 theano
 cython
 h5py
+lasagne
+numpy
+scipy
+nose
+pillow
+pyglet
